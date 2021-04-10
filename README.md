@@ -23,7 +23,7 @@ use std::path::Path;
 fn main() {
     let mut buf = io::BufReader::new(
         fs::File::open("game.slp").unwrap());
-    let game = peppi::game(&mut buf, false).unwrap();
+    let game = peppi::game(&mut buf, None).unwrap();
     println!("{:#?}", game);
 }
 ```
@@ -50,7 +50,7 @@ fn main() {
     let mut r = io::BufReader::new(f);
     let mut handlers = FramePrinter {};
 
-    peppi::parse(&mut r, &mut handlers, false).unwrap();
+    peppi::parse(&mut r, &mut handlers, None).unwrap();
 }
 ```
 
