@@ -18,7 +18,7 @@ peppi = { git = "https://github.com/hohav/peppi" }
 ### Object-based parsing:
 
 ```rust
-use std::path::Path;
+use std::{fs, io};
 
 fn main() {
     let mut buf = io::BufReader::new(
@@ -33,8 +33,8 @@ fn main() {
 ```rust
 use std::{fs, io};
 
-use peppi::parse::{Handlers, FrameEvent, PortId};
 use peppi::frame;
+use peppi::parse::{Handlers, FrameEvent, PortId};
 
 struct FramePrinter {}
 
