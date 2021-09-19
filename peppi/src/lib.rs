@@ -37,6 +37,7 @@ pub mod slippi;
 pub mod stage;
 pub mod triggers;
 pub mod ubjson;
+pub mod unparse;
 
 use std::{
 	error,

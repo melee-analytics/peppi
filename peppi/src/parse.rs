@@ -46,11 +46,11 @@ struct CharState {
 	age: u32,
 }
 
-const PAYLOADS_EVENT_CODE: u8 = 0x35;
+pub(super) const PAYLOADS_EVENT_CODE: u8 = 0x35;
 
-#[derive(Clone, Copy, Debug, PartialEq, num_enum::TryFromPrimitive)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, num_enum::TryFromPrimitive)]
 #[repr(u8)]
-enum Event {
+pub(super) enum Event {
 	GameStart = 0x36,
 	FramePre = 0x37,
 	FramePost = 0x38,
