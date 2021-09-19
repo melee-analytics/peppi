@@ -82,9 +82,6 @@ pub struct Player {
 	pub defense_ratio: f32,
 	pub model_scale: f32,
 
-	#[serde(skip)] #[doc(hidden)]
-	pub unmapped: PlayerUnmapped,
-
 	// v1_0
 	#[serde(skip_serializing_if = "Option::is_none")]
 	pub ucf: Option<Ucf>,
@@ -117,8 +114,8 @@ pub struct Start {
 	pub players: Vec<Player>,
 	pub random_seed: u32,
 
-	#[serde(skip)] #[doc(hidden)]
-	pub unmapped: StartUnmapped,
+	#[serde(skip)]
+	pub raw_bytes: Vec<u8>,
 
 	// v1.5
 	#[serde(skip_serializing_if = "Option::is_none")]
@@ -129,24 +126,6 @@ pub struct Start {
 	// v3.7
 	#[serde(skip_serializing_if = "Option::is_none")]
 	pub scene: Option<Scene>,
-}
-
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct StartUnmapped(pub [u8; 73]);
-
-impl Default for StartUnmapped {
-	fn default() -> Self {
-		Self([0; 73])
-	}
-}
-
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct PlayerUnmapped(pub [u8; 15]);
-
-impl Default for PlayerUnmapped {
-	fn default() -> Self {
-		Self([0; 15])
-	}
 }
 
 pseudo_enum!(EndMethod: u8 {

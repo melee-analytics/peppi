@@ -255,7 +255,6 @@ fn player(port: Port, v0: &[u8; 36], is_teams: bool, v1_0: Option<[u8; 8]>, v1_3
 			offense_ratio: offense_ratio,
 			defense_ratio: defense_ratio,
 			model_scale: model_scale,
-			unmapped: game::PlayerUnmapped(unmapped),
 			// v1_0
 			ucf: ucf,
 			// v1_3
@@ -286,6 +285,7 @@ fn player_bytes_v1_0(r: &mut &[u8]) -> Result<[u8; 8]> {
 }
 
 fn game_start(mut r: &mut &[u8]) -> Result<game::Start> {
+	let raw_bytes = r.to_vec();
 	let slippi = slippi::Slippi {
 		version: slippi::Version(r.read_u8()?, r.read_u8()?, r.read_u8()?),
 	};
@@ -381,7 +381,7 @@ fn game_start(mut r: &mut &[u8]) -> Result<game::Start> {
 		damage_ratio: damage_ratio,
 		players: players,
 		random_seed: random_seed,
-		unmapped: game::StartUnmapped(unmapped),
+		raw_bytes: raw_bytes,
 		// v1.5
 		is_pal: is_pal,
 		// v2.0
