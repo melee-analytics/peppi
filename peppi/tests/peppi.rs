@@ -7,7 +7,7 @@ use peppi::{
 	buttons::{Logical, Physical},
 	character::{Internal, External},
 	frame::Buttons,
-	game::{DashBack, End, EndMethod, Frames, Game, Player, PlayerType, Start, ShieldDrop, Ucf},
+	game::{DashBack, End, EndMethod, Frames, Game, Player, PlayerType, PlayerUnmapped, Start, StartUnmapped, ShieldDrop, Ucf},
 	slippi::{Slippi, Version},
 	item::{self, Item},
 	metadata::{self, Metadata},
@@ -110,6 +110,7 @@ fn basic_game() -> Result<(), String> {
 				offense_ratio: 0.0,
 				defense_ratio: 1.0,
 				model_scale: 1.0,
+				unmapped: PlayerUnmapped([0, 0, 0, 120, 0, 0, 4, 0, 0, 0, 0, 63, 128, 0, 0]),
 				ucf: Some(Ucf {
 					dash_back: None,
 					shield_drop: None,
@@ -130,6 +131,7 @@ fn basic_game() -> Result<(), String> {
 				offense_ratio: 0.0,
 				defense_ratio: 1.0,
 				model_scale: 1.0,
+				unmapped: PlayerUnmapped([0, 1, 0, 120, 0, 0, 4, 0, 0, 0, 0, 63, 128, 0, 0]),
 				ucf: Some(Ucf {
 					dash_back: None,
 					shield_drop: None,
@@ -139,6 +141,7 @@ fn basic_game() -> Result<(), String> {
 			},
 		],
 		random_seed: 3803194226,
+		unmapped: StartUnmapped([195, 0, 0, 0, 0, 110, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255, 255, 0, 0, 0, 0, 63, 128, 0, 0, 63, 128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
 		is_pal: None,
 		is_frozen_ps: None,
 		scene: None,

@@ -18,7 +18,7 @@ use super::{
 	buttons,
 	character::{self, Internal},
 	frame::{self, Pre, Post},
-	game::{self, NUM_PORTS, Netplay, Player, PlayerType},
+	game::{self, MAX_PLAYERS, NUM_PORTS, Netplay, Player, PlayerType},
 	ground,
 	item::{self, Item},
 	primitives::{Port, Position, Velocity},
@@ -166,11 +166,13 @@ fn payload_sizes<R: Read>(r: &mut R) -> Result<(usize, HashMap<u8, u16>)> {
 
 fn player(port: Port, v0: &[u8; 36], is_teams: bool, v1_0: Option<[u8; 8]>, v1_3: Option<[u8; 16]>, v3_9: Option<[u8; 41]>) -> Result<Option<Player>> {
 	let mut r = &v0[..];
+	let mut unmapped = [0; 15];
+
 	let character = character::External(r.read_u8()?);
 	let r#type = game::PlayerType(r.read_u8()?);
 	let stocks = r.read_u8()?;
 	let costume = r.read_u8()?;
-	r.read_exact(&mut [0; 3])?; // ???
+	r.read_exact(&mut unmapped[0..3])?;
 	let team_shade = r.read_u8()?;
 	let handicap = r.read_u8()?;
 	let team_color = r.read_u8()?;
@@ -183,9 +185,9 @@ fn player(port: Port, v0: &[u8; 36], is_teams: bool, v1_0: Option<[u8; 8]>, v1_3
 			false => None,
 		}
 	};
-	r.read_u16::<BE>()?; // ???
+	r.read_exact(&mut unmapped[3..5])?;
 	let bitfield = r.read_u8()?;
-	r.read_u16::<BE>()?; // ???
+	r.read_exact(&mut unmapped[5..7])?;
 	let cpu_level = {
 		let cpu_level = r.read_u8()?;
 		match r#type {
@@ -193,11 +195,11 @@ fn player(port: Port, v0: &[u8; 36], is_teams: bool, v1_0: Option<[u8; 8]>, v1_3
 			_ => None,
 		}
 	};
-	r.read_u32::<BE>()?; // ???
+	r.read_exact(&mut unmapped[7..11])?;
 	let offense_ratio = r.read_f32::<BE>()?;
 	let defense_ratio = r.read_f32::<BE>()?;
 	let model_scale = r.read_f32::<BE>()?;
-	r.read_u32::<BE>()?; // ???
+	r.read_exact(&mut unmapped[11..15])?;
 	// total bytes: 0x24
 
 	// v1.0
@@ -253,6 +255,7 @@ fn player(port: Port, v0: &[u8; 36], is_teams: bool, v1_0: Option<[u8; 8]>, v1_3
 			offense_ratio: offense_ratio,
 			defense_ratio: defense_ratio,
 			model_scale: model_scale,
+			unmapped: game::PlayerUnmapped(unmapped),
 			// v1_0
 			ucf: ucf,
 			// v1_3
@@ -286,39 +289,38 @@ fn game_start(mut r: &mut &[u8]) -> Result<game::Start> {
 	let slippi = slippi::Slippi {
 		version: slippi::Version(r.read_u8()?, r.read_u8()?, r.read_u8()?),
 	};
-
 	r.read_u8()?; // unused (build number)
+
+	let mut unmapped = [0; 73];
 	let bitfield = {
 		let mut buf = [0; 4];
 		r.read_exact(&mut buf)?;
 		buf
 	};
-	r.read_u16::<BE>()?; // ???
+	r.read_exact(&mut unmapped[0..2])?;
 	let is_raining_bombs = r.read_u8()? != 0;
-	r.read_u8()?; // ???
+	r.read_exact(&mut unmapped[2..3])?;
 	let is_teams = r.read_u8()? != 0;
-	r.read_u16::<BE>()?; // ???
+	r.read_exact(&mut unmapped[3..5])?;
 	let item_spawn_frequency = r.read_i8()?;
 	let self_destruct_score = r.read_i8()?;
-	r.read_u8()?; // ???
+	r.read_exact(&mut unmapped[5..6])?;
 	let stage = stage::Stage(r.read_u16::<BE>()?);
 	let timer = r.read_u32::<BE>()?;
-	r.read_exact(&mut [0; 15])?; // ???
+	r.read_exact(&mut unmapped[6..21])?;
 	let item_spawn_bitfield = {
 		let mut buf = [0; 5];
 		r.read_exact(&mut buf)?;
 		buf
 	};
-	r.read_u64::<BE>()?; // ???
+	r.read_exact(&mut unmapped[21..29])?;
 	let damage_ratio = r.read_f32::<BE>()?;
-	r.read_exact(&mut [0; 44])?; // ???
+	r.read_exact(&mut unmapped[29..73])?;
 	// @0x65
-	let mut players_v0 = [[0; 36]; 4];
+	let mut players_v0 = [[0; 36]; MAX_PLAYERS];
 	for p in &mut players_v0 {
 		r.read_exact(p)?;
 	}
-	// @0xf5
-	r.read_exact(&mut [0; 72])?; // ???
 	// @0x13d
 	let random_seed = r.read_u32::<BE>()?;
 
@@ -379,6 +381,7 @@ fn game_start(mut r: &mut &[u8]) -> Result<game::Start> {
 		damage_ratio: damage_ratio,
 		players: players,
 		random_seed: random_seed,
+		unmapped: game::StartUnmapped(unmapped),
 		// v1.5
 		is_pal: is_pal,
 		// v2.0
